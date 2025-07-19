@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <script src="{{ url_for('static', filename='wallet.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>KYC Web 3.0 Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+    <!-- In index.html head section -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+</head>
+
+<body>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <header>
+        <div class="title">KYC Verification Platform</div>
+        <div class="buttons">
+            <a href="javascript:void(0);" onclick="createBankProfile()" class="btn btn-primary">Create bank Profile</a>
+            <a href="javascript:void(0);" onclick="connectWallet()" class="btn btn-primary">Create user Profile</a>
+            <a href="javascript:void(0);" class="btn btn-outline" onclick="loginUser()">Login</a>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="animated-text">
+            <h1>This is <span class="highlight">KYC</span> Website</h1>
+            <p>Based on <strong>Smart Contract</strong> technology, users can securely upload verified documents to
+                <strong>Web 3.0 Storage</strong>.
+            </p>
+            <p>Access is strictly controlled: Only <strong>bank authorities</strong> can
+                view the documents.</p>
+        </div>
+    </section>
+
+    <!-- ✅ Footer placed directly at bottom -->
+    <footer class="footer">
+        <p>&copy; 2025 Tahmid hasan rafi. All rights reserved.</p>
+    </footer>
+
+</body>
+
+</html>

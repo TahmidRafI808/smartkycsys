@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Previous Versions</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleprevious.css') }}">
+</head>
+
+<body>
+    <div class="header">
+        <h2>Previous Data Versions</h2>
+        <button onclick="location.href='/login?wallet={{ wallet }}'" class="back-button">
+            &#8592; Back to Profile
+        </button>
+    </div>
+
+    <div class="versions-container">
+        {% if versions %}
+        <table class="versions-table">
+            <thead>
+                <tr>
+                    <th>Last Modified</th>
+                    <th>Version ID</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for version in versions %}
+                <tr>
+                    <td>{{ version['LastModified'].strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td class="version-id">{{ version['VersionId'][:8] }}...</td>
+                    <td>
+                        <button
+                            onclick="location.href='/view-version?wallet={{ wallet }}&version_id={{ version.VersionId | urlencode }}'">
+                            View This Version
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-versions">
+            <p>No previous versions found</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Tahmid hasan rafi. All rights reserved.</p>
+    </footer>
+</body>
+
+</html>

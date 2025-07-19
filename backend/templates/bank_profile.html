@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Bank Authority Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleprofile.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <script>
+        async function signAndSendTransaction(txData, wallet) {
+            if (!window.ethereum) {
+                alert("MetaMask not found. Please install MetaMask.");
+                return false;
+            }
+
+            try {
+                const web3 = new Web3(window.ethereum);
+                const tx = {
+                    from: wallet,
+                    to: txData.to,
+                    data: txData.data,
+                    value: txData.value,
+                    gas: txData.gas,
+                    gasPrice: txData.gasPrice,
+                    nonce: txData.nonce,
+                    chainId: txData.chainId,
+                    type: '0x0'
+                };
+
+                console.log("Sending transaction:", tx);
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [tx]
+                });
+
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('tx-hash').innerText = `Transaction Hash: ${txHash}`;
+                document.getElementById('tx-link').href = `https://sepolia.explorer.zksync.io/tx/${txHash}`;
+                document.getElementById('tx-link').style.display = 'block';
+
+                const receipt = await waitForTransactionReceipt(web3, txHash);
+                if (receipt.status) {
+                    return true;
+                } else {
+                    throw new Error("Transaction failed");
+                }
+            } catch (error) {
+                console.error("Transaction failed:", error);
+                alert("Transaction failed: " + error.message);
+                return false;
+            }
+        }
+
+        async function waitForTransactionReceipt(web3, txHash) {
+            return new Promise((resolve, reject) => {
+                const checkInterval = setInterval(async () => {
+                    try {
+                        const receipt = await web3.eth.getTransactionReceipt(txHash);
+                        if (receipt) {
+                            clearInterval(checkInterval);
+                            resolve(receipt);
+                        }
+                    } catch (error) {
+                        clearInterval(checkInterval);
+                        reject(error);
+                    }
+                }, 3000);
+            });
+        }
+
+        async function submitForm(event) {
+            event.preventDefault();
+            document.getElementById('loading').style.display = 'block';
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('/submit-bank-profile', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    const success = await signAndSendTransaction(result.txData, result.wallet);
+                    if (success) {
+                        alert('Transaction successful! Profile submitted for admin approval.');
+                        window.location.href = `/login?wallet=${result.wallet}`;
+                    }
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                alert('Submission failed: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</head>
+
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="flash {{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+        <h2>Create Bank Authority Profile</h2>
+
+        <div id="loading" style="display:none; text-align:center; padding:20px;">
+            <p>Processing transaction... Please confirm in MetaMask</p>
+            <div class="spinner"></div>
+            <p id="tx-hash" style="word-break: break-all; font-size: 12px; margin-top: 15px;"></p>
+            <a id="tx-link" href="#" target="_blank" style="display: none;">View on Explorer</a>
+        </div>
+
+        <form id="bankProfileForm" method="POST" enctype="multipart/form-data" onsubmit="submitForm(event)">
+            <fieldset>
+                <legend>Bank Information</legend>
+                <input type="text" name="bank_name" placeholder="Bank Name" required>
+                <input type="email" name="email" placeholder="Official Email" required>
+                <input type="tel" name="phone" placeholder="Contact Phone" required>
+                <input type="text" name="license_number" placeholder="Bank License Number" required>
+            </fieldset>
+
+            <fieldset>
+                <legend>Bank Logo</legend>
+                <div class="form-group">
+                    <label for="bank_logo">Bank Logo (JPG/PNG)</label>
+                    <input type="file" name="bank_logo" accept="image/*" required>
+                </div>
+            </fieldset>
+
+            <input type="hidden" name="wallet_address" value="{{ wallet }}">
+            <input type="submit" value="Submit for Approval">
+        </form>
+    </div>
+
+    <style>
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        legend {
+            font-weight: bold;
+            padding: 0 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+    </style>
+</body>
+
+</html>

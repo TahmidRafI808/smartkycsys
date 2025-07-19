@@ -1,1 +1,794 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+    <title>User Profile</title>
+    <script src="{{ url_for('static', filename='wallet.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styleviewprofile.css') }}">
+    <!-- Add Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Add custom styles for the new loan request section */
+        .loan-request-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .bank-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .bank-logo {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin-right: 1rem;
+        }
+
+        .request-button {
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Added styles for Approved Banks section */
+        .bank-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+        }
+
+        .bank-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .search-box {
+            display: flex;
+            margin: 15px 0;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-box button {
+            padding: 8px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Chat Modal Styles */
+        #chatModal {
+            display: none;
+        }
+
+        .chat-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .message {
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-sent {
+            background-color: #e3f2fd;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message-received {
+            background-color: #f5f5f5;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 3px;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #777;
+            text-align: right;
+            margin-top: 3px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .chat-send-btn {
+            padding: 10px 15px;
+            background: #1a3a6c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Rating Styles */
+        .rating-entry {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .rating-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .rating-bank {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            font-size: 1.2rem;
+            margin: 5px 0;
+        }
+
+        .rating-comment {
+            font-style: italic;
+            color: #495057;
+            margin: 10px 0;
+        }
+
+        .rating-timestamp {
+            font-size: 0.8rem;
+            color: #6c757d;
+            text-align: right;
+        }
+
+        .no-ratings {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+        }
+
+        .no-ratings i {
+            font-size: 3rem;
+            color: #e9ecef;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="top">
+        <div class="left-title">Personal information</div>
+        <div class="right-title">Rating</div>
+        <div class="status-section mb-3">
+            <strong>Status: </strong>
+            <span id="statusDisplay" class="badge 
+        {% if data.verification_status == 0 %} bg-secondary
+        {% elif data.verification_status == 1 %} bg-warning text-dark
+        {% elif data.verification_status == 2 %} bg-success
+        {% endif %}">
+                {% if data.verification_status == 0 %} Unverified
+                {% elif data.verification_status == 1 %} Pending Verification
+                {% elif data.verification_status == 2 %} Verified by Admin
+                {% endif %}
+            </span>
+
+            {% if (session.user_logged_in and session.user_wallet|lower == wallet|lower) and data.verification_status ==
+            0 %}
+            <button id="requestVerificationBtn" class="btn btn-sm btn-outline-warning ms-2">
+                Request Verification
+            </button>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <img class="profile-pic" src="{{ profile_pic_url }}" alt="Profile Picture">
+
+    <div class="container">
+        <!-- Left Column -->
+        <div class="left">
+            {% if data.profile_type == 'bank' %}
+            <!-- Bank Profile View -->
+            <div><strong>Bank Name</strong><br> {{ data.name }}</div>
+            <div><strong>Email</strong><br> {{ data.email }}</div>
+            <div><strong>Phone Number</strong><br> {{ data.phone }}</div>
+            <div><strong>License Number</strong><br> {{ data.license_number }}</div>
+            {% else %}
+            <!-- User Profile View -->
+            <div><strong>Full Name</strong><br> {{ data.full_name }}</div>
+            <div><strong>Email</strong><br> {{ data.email }}</div>
+            <div><strong>Phone Number</strong><br> {{ data.phone }}</div>
+            <div><strong>Current Address</strong><br> {{ data.current_address }}</div>
+            <div><strong>Permanent Address</strong><br> {{ data.permanent_address }}</div>
+            <div><strong>Current Job/Profession</strong><br> {{ data.current_job }}</div>
+            <div><strong>National ID Number</strong><br> {{ data.nid_number }}</div>
+            {% endif %}
+
+            <!-- Property Documents -->
+            <div style="margin-top: 20px;">
+                <strong>Property Documents</strong><br>
+                {% for doc in property_docs %}
+                <a href="{{ doc.url }}" class="doc-button" target="_blank">
+                    {{ doc.filename }}
+                </a><br>
+                {% endfor %}
+            </div>
+
+            <!-- Added Approved Banks Section -->
+            {% if profile_type == 'user' %}
+            <div class="section-card" style="margin-top: 20px;">
+                <div class="section-title">Approved Banks</div>
+                <div class="search-box">
+                    <input type="text" id="searchBank" placeholder="Search banks by name...">
+                    <button id="searchBanksBtn">Search</button>
+                </div>
+                <div id="bankList" class="row mt-3">
+                    <!-- Banks will be loaded here -->
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Active Deals Section -->
+            <div class="section-card" style="margin-top: 20px;">
+                <div class="section-title">Active Deals</div>
+                {% if deals %}
+                {% for deal in deals %}
+                <div class="deal-item">
+                    <div class="deal-header">
+                        <div class="deal-id">Deal #{{ deal.deal_id }}</div>
+                        <div class="deal-status status-{{ deal.status }}">{{ deal.status|upper }}</div>
+                    </div>
+
+                    <div class="deal-details">
+                        <div class="deal-detail">
+                            <span class="deal-label">Bank:</span>
+                            <span class="deal-value">{{ deal.bank }}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Amount:</span>
+                            <span class="deal-value">${{ deal.amount }}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Start Date:</span>
+                            <span class="deal-value">{{ deal.start_date|format_timestamp }}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Deadline:</span>
+                            <span class="deal-value">{{ deal.deadline|format_timestamp }}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Payment Type:</span>
+                            <span class="deal-value">
+                                {% if deal.monthly_payment %}Monthly{% else %}Lump Sum{% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-file-contract"></i>
+                    <p>No active deals yet</p>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if not is_historical %}
+            <button class="previous-button" onclick="location.href='/previous-data?wallet={{ data.wallet }}'">
+                PREVIOUS DATA
+            </button>
+
+            {% if session.user_logged_in or session.bank_logged_in %}
+            <button class="update-button" onclick="location.href='/submit-profile?wallet={{ data.wallet }}'">
+                UPDATE INFO
+            </button>
+            {% endif %}
+            {% else %}
+            <div class="historical-warning">
+                <strong>VIEWING HISTORICAL VERSION</strong>
+            </div>
+            <button class="back-button" onclick="location.href='/previous-data?wallet={{ data.wallet }}'">
+                &#8592; Back to Versions
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- Right Column - Rating Section -->
+        <div class="right">
+            <div class="section-title">Rating</div>
+            <div class="comments-slider">
+                {% if ratings %}
+                {% for rating in ratings %}
+                <div class="rating-entry">
+                    <div class="rating-header">
+                        <div class="rating-bank">{{ rating.bank_name }}</div>
+                        <div class="rating-timestamp">{{ rating.timestamp|format_timestamp }}</div>
+                    </div>
+                    <div class="rating-stars">
+                        {% for i in range(1,6) %}
+                        {% if i <= rating.stars %} <i class="fas fa-star"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                            {% endfor %}
+                    </div>
+                    <div class="rating-comment">{{ rating.comment }}</div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <div class="no-ratings">
+                    <i class="far fa-star"></i>
+                    <p>No ratings yet</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="logout-container">
+        <div class="logout-button">
+            {% if session.user_logged_in %}
+            <a href="/logout?wallet={{ session.user_wallet }}" class="button">Logout</a>
+            {% elif session.bank_logged_in %}
+            <a href="/banklogout?wallet={{ session.bank_wallet }}" class="button">Bank Logout</a>
+            {% elif session.admin_logged_in %}
+            <a href="/adminlogout" class="button">Admin Logout</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2025 Tahmid hasan rafi. All rights reserved.</p>
+    </footer>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="modal">
+        <div class="chat-modal-content">
+            <div class="chat-header">
+                <h4 id="chatTitle">Chat with Bank</h4>
+                <button id="closeChatModal" style="background: none; border: none; font-size: 1.5rem;">&times;</button>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your message...">
+                <button id="sendChatBtn" class="chat-send-btn">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Added Approved Banks Script -->
+    {% if profile_type == 'user' %}
+    <script>
+        document.getElementById('requestVerificationBtn')?.addEventListener('click', async () => {
+            try {
+                const response = await fetch('/request-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Sign and send transaction via wallet.js
+                    const txHash = await signAndSendTransaction(result.txData);
+                    if (txHash) {
+                        alert('Verification requested successfully!');
+                        location.reload();
+                    }
+                } else {
+                    alert('Error: ' + (result.message || 'Request failed'));
+                }
+            } catch (error) {
+                console.error('Verification request error:', error);
+                alert('Request failed: ' + error.message);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const bankList = document.getElementById('bankList');
+            const searchBtn = document.getElementById('searchBanksBtn');
+
+            // Function to load banks
+            async function loadBanks(query = '') {
+                try {
+                    const response = await fetch(`/get-approved-banks`);
+                    const banks = await response.json();
+
+                    bankList.innerHTML = '';
+
+                    if (banks.length === 0) {
+                        bankList.innerHTML = '<div class="col-12 text-center py-4">No approved banks found</div>';
+                        return;
+                    }
+
+                    // Filter by query
+                    const filteredBanks = banks.filter(bank =>
+                        bank.name.toLowerCase().includes(query.toLowerCase())
+                    );
+
+                    filteredBanks.forEach(bank => {
+                        const logoUrl = bank.logo_cid ?
+                            `{{ gateway_url }}${bank.logo_cid}` :
+                            'https://via.placeholder.com/50x50?text=BANK';
+
+                        const bankCard = `
+                        <div class="col-md-6 mb-4">
+                            <div class="card bank-card">
+                                <div class="row g-0">
+                                    <div class="col-md-4 d-flex align-items-center justify-content-center p-2">
+                                        <img src="${logoUrl}" class="img-fluid rounded" alt="${bank.name}">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="card-body">
+                                            <h5 class="card-title">${bank.name}</h5>
+                                            <p class="card-text text-muted small">${bank.wallet}</p>
+                                            <div class="d-flex gap-2 mt-3">
+                                                <button class="btn btn-sm btn-outline-primary view-bank-btn" 
+                                                    data-wallet="${bank.wallet}">
+                                                    View Profile
+                                                </button>
+                                                
+                                                <button class="btn btn-sm btn-warning loan-request-btn" 
+                                                    data-wallet="${bank.wallet}"
+                                                    data-name="${bank.name}">
+                                                    Loan Request
+                                                </button>
+                                                
+                                                <button class="btn btn-sm btn-info message-bank-btn" 
+                                                    data-wallet="${bank.wallet}"
+                                                    data-name="${bank.name}">
+                                                    <i class="fas fa-comments me-1"></i> Message
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                        bankList.innerHTML += bankCard;
+                    });
+
+                    // Add event listeners to buttons
+                    document.querySelectorAll('.view-bank-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const wallet = btn.dataset.wallet;
+                            window.location.href = `/view-profile/${wallet}`;
+                        });
+                    });
+
+                    document.querySelectorAll('.loan-request-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const wallet = btn.dataset.wallet;
+                            const name = btn.dataset.name;
+                            openLoanRequestModal(wallet, name);
+                        });
+                    });
+
+                    document.querySelectorAll('.message-bank-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            const wallet = btn.dataset.wallet;
+                            const name = btn.dataset.name;
+                            openChatModal(wallet, name);
+                        });
+                    });
+
+                } catch (error) {
+                    console.error('Error loading banks:', error);
+                    bankList.innerHTML = '<div class="col-12 text-center py-4 text-danger">Error loading banks</div>';
+                }
+            }
+
+            // Search functionality
+            searchBtn.addEventListener('click', () => {
+                const query = document.getElementById('searchBank').value;
+                loadBanks(query);
+            });
+
+            // Initial load
+            loadBanks();
+
+            // Chat functionality
+            let currentChatBank = null;
+            let currentBankName = null;
+            let chatRefreshInterval = null;
+
+            function openChatModal(bankWallet, bankName) {
+                currentChatBank = bankWallet;
+                currentBankName = bankName;
+                document.getElementById('chatTitle').textContent = `Chat with ${bankName}`;
+                document.getElementById('chatModal').style.display = 'flex';
+                loadChatMessages();
+
+                // Refresh messages every 5 seconds
+                if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+                chatRefreshInterval = setInterval(loadChatMessages, 5000);
+            }
+
+            function closeChatModal() {
+                document.getElementById('chatModal').style.display = 'none';
+                currentChatBank = null;
+                currentBankName = null;
+
+                // Clear refresh interval
+                if (chatRefreshInterval) {
+                    clearInterval(chatRefreshInterval);
+                    chatRefreshInterval = null;
+                }
+            }
+
+            async function loadChatMessages() {
+                if (!currentChatBank) return;
+
+                try {
+                    const userWallet = "{{ wallet }}".toLowerCase();
+                    const response = await fetch(`/get-chat-messages?user=${userWallet}&bank=${currentChatBank}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const chatContainer = document.getElementById('chatMessages');
+                        chatContainer.innerHTML = '';
+
+                        result.messages.forEach(msg => {
+                            const isUser = msg.sender.toLowerCase() === userWallet;
+                            const time = new Date(msg.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                            const msgDiv = document.createElement('div');
+                            msgDiv.className = `message ${isUser ? 'message-sent' : 'message-received'}`;
+
+                            msgDiv.innerHTML = `
+                                <div class="message-sender">${isUser ? 'You' : currentBankName}</div>
+                                <div>${msg.text}</div>
+                                <div class="message-time">${time}</div>
+                            `;
+
+                            chatContainer.appendChild(msgDiv);
+                        });
+
+                        // Scroll to bottom
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error loading chat:', error);
+                }
+            }
+
+            async function sendChatMessage() {
+                const message = document.getElementById('chatInput').value.trim();
+                if (!message || !currentChatBank) return;
+
+                try {
+                    const userWallet = "{{ wallet }}".toLowerCase();
+                    const response = await fetch('/send-chat-message', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            sender: userWallet,
+                            receiver: currentChatBank,
+                            message: message
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        // Clear input and reload messages
+                        document.getElementById('chatInput').value = '';
+                        loadChatMessages();
+                    } else {
+                        console.error('Failed to send message:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Error sending message:', error);
+                }
+            }
+
+            // Add event listeners
+            document.getElementById('closeChatModal').addEventListener('click', closeChatModal);
+            document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target.id === 'chatModal') closeChatModal();
+            });
+
+            // Loan Request Modal
+            function openLoanRequestModal(bankWallet, bankName) {
+                const modal = document.createElement('div');
+                modal.className = 'modal';
+                modal.innerHTML = `
+                    <div class="modal-content">
+                        <h4>Loan Request to ${bankName}</h4>
+                        <input type="hidden" id="loanBankWallet" value="${bankWallet}">
+                        <div class="form-group">
+                            <label>Amount (USD)</label>
+                            <input type="number" id="loanRequestAmount" class="form-control" placeholder="Amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Duration (months)</label>
+                            <input type="number" id="loanRequestDuration" class="form-control" placeholder="Duration" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Type</label>
+                            <select id="loanRequestPaymentType" class="form-control">
+                                <option value="monthly">Monthly Payments</option>
+                                <option value="yearly">Yearly Payments</option>
+                            </select>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" id="closeLoanRequestModal">Cancel</button>
+                            <button class="btn btn-primary" id="submitLoanRequestBtn">Submit Request</button>
+                        </div>
+                    </div>`;
+
+                document.body.appendChild(modal);
+
+                // Close modal
+                document.getElementById('closeLoanRequestModal').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+
+                // Submit loan request
+                document.getElementById('submitLoanRequestBtn').addEventListener('click', async () => {
+                    const amount = document.getElementById('loanRequestAmount').value;
+                    const duration = document.getElementById('loanRequestDuration').value;
+                    const paymentType = document.getElementById('loanRequestPaymentType').value;
+                    const bankWallet = document.getElementById('loanBankWallet').value;
+
+                    if (!amount || !duration) {
+                        alert('Please fill in all fields');
+                        return;
+                    }
+
+                    try {
+                        const response = await fetch('/create-directed-loan-request', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                bank_wallet: bankWallet,
+                                amount: amount,
+                                duration: duration,
+                                payment_type: paymentType
+                            })
+                        });
+
+                        const result = await response.json();
+
+                        if (result.success) {
+                            alert('Loan request submitted successfully!');
+                            document.body.removeChild(modal);
+                        } else {
+                            alert('Failed to submit loan request: ' + (result.error || 'Unknown error'));
+                        }
+                    } catch (error) {
+                        console.error('Error submitting loan request:', error);
+                        alert('Failed to submit loan request');
+                    }
+                });
+            }
+        });
+    </script>
+    {% endif %}
+</body>
+
+</html>

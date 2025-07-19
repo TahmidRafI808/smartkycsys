@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Authority Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a3a6c;
+            --secondary-color: #2c5282;
+            --accent-color: #38a169;
+            --light-color: #f0f7ff;
+            --dark-color: #1a202c;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--dark-color);
+            padding-bottom: 60px;
+        }
+
+        .bank-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 0;
+            border-bottom: 4px solid var(--accent-color);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .profile-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .profile-card-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem;
+            text-align: left;
+        }
+
+        .profile-pic-container {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            overflow: hidden;
+            margin: -70px auto 1rem;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .bank-info {
+            padding: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--light-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 0.5rem 0;
+        }
+
+        .stats-label {
+            color: #718096;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bank-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--accent-color);
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .action-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .bank-footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .wallet-display {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: var(--dark-color);
+        }
+
+        .search-container {
+            background: white;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 1.5rem 0;
+        }
+
+        .search-container input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        .search-container button {
+            background: transparent;
+            border: none;
+            color: var(--primary-color);
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 1.5rem;
+        }
+
+        .message-item {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+        }
+
+        .message-item:hover {
+            background: #f8f9fa;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .message-content {
+            margin: 0.5rem 0;
+            color: #4a5568;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #718096;
+        }
+
+        .view-profile-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .view-profile-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .empty-state {
+            padding: 2rem;
+            text-align: center;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #cbd5e0;
+        }
+
+        .request-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            position: relative;
+        }
+
+        .request-item p {
+            margin: 0.25rem 0;
+        }
+
+        .deal-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .deal-id {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .deal-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-completed {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+
+        .star-rating {
+            font-size: 24px;
+            color: #ffc107;
+            cursor: pointer;
+        }
+
+        .star-rating .fas {
+            color: #ffc107;
+        }
+
+        .deal-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .deal-detail {
+            font-size: 0.9rem;
+        }
+
+        .deal-label {
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .deal-value {
+            color: #2d3748;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .modal h3 {
+            margin-top: 0;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .success-message {
+            background: #dcfce7;
+            color: #15803d;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            display: none;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+            justify-content: flex-end;
+        }
+
+        .request-action-button {
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+        }
+
+        .request-accept {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .request-reject {
+            background-color: #e53e3e;
+            color: white;
+        }
+
+        .date-info {
+            font-size: 0.9rem;
+            color: #4a5568;
+            margin-top: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .badge-active {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-completed {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        /* Chat Panel Styles */
+        .chat-panel {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .chat-panel-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-panel-title {
+            margin: 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chat-panel-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-panel-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .chat-users-container {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            background: #f8f9fa;
+        }
+
+        .chat-user-tab {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chat-user-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .chat-user-tab.unread::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: #e53e3e;
+            border-radius: 50%;
+            margin-left: 5px;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message-sent {
+            align-self: flex-end;
+            background-color: #e3f2fd;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-received {
+            align-self: flex-start;
+            background-color: #f1f0f0;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-sender {
+            font-weight: bold;
+            font-size: 0.85rem;
+            margin-bottom: 3px;
+        }
+
+        .message-text {
+            margin: 0;
+            word-wrap: break-word;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #777;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .send-chat-btn {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .no-chat-selected {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .minimized {
+            height: 50px;
+            overflow: hidden;
+            width: 200px;
+        }
+
+        /* Chat Partners Section */
+        .chat-partner-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .chat-partner-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-partner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .partner-name {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .chat-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chat-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .partner-wallet {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 8px;
+            word-break: break-all;
+        }
+
+        .last-chat {
+            font-size: 0.9rem;
+            color: #4a5568;
+            font-style: italic;
+        }
+
+        .view-profile-btn {
+            background-color: #1a3a6c;
+            /* Primary blue */
+            color: white;
+        }
+
+        .view-profile-btn:hover {
+            background-color: #2c5282;
+            /* Darker blue */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="bank-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1><i class="fas fa-university me-2"></i>Bank Authority Dashboard</h1>
+                    <p class="lead mb-0">Manage KYC verifications and customer profiles</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="wallet-display">
+                        <i class="fas fa-wallet me-2"></i>{{ wallet }}
+                    </div>
+                    <a href="/banklogout?wallet={{ wallet }}" onclick="banklogout()" class="logout-btn">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container my-4">
+        <!-- Status Messages -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div id="successMessage" class="success-message">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="successText"></span>
+                </div>
+                <div id="errorMessage" class="error-message">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <span id="errorText"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Card -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="profile-card">
+                    <div class="profile-card-header">
+                        <h2 class="mb-0">{{ data.name }}</h2>
+                    </div>
+                    <div class="profile-pic-container">
+                        {% if profile_pic_url %}
+                        <img src="{{ profile_pic_url }}" alt="{{ data.name }} Logo" class="profile-pic">
+                        {% else %}
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="fas fa-university fa-3x text-primary"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="bank-info">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-id-card"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">License Number</h5>
+                                <p class="mb-0">{{ data.license_number }}</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Email Address</h5>
+                                <p class="mb-0">{{ data.email }}</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Contact Number</h5>
+                                <p class="mb-0">{{ data.phone }}</p>
+                            </div>
+                        </div>
+                        <div class="info-item mb-0">
+                            <div class="info-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">Verification Status</h5>
+                                <p class="mb-0 text-success">
+                                    <i class="fas fa-check-circle me-1"></i>Verified by Admin
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                    <div class="stats-number" id="totalCustomers">0</div>
+                    <div class="stats-label">Total Customers</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="fas fa-file-alt fa-2x text-primary mb-3"></i>
+                    <div class="stats-number" id="pendingKYC">0</div>
+                    <div class="stats-label">Pending KYC</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="fas fa-check-circle fa-2x text-primary mb-3"></i>
+                    <div class="stats-number" id="verifiedProfiles">0</div>
+                    <div class="stats-label">Verified Profiles</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <i class="fas fa-comments fa-2x text-primary mb-3"></i>
+                    <div class="stats-number" id="activeChats">0</div>
+                    <div class="stats-label">Active Chats</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Loan Requests Section -->
+        <div class="row mt-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h4><i class="fas fa-file-invoice-dollar me-2"></i>Pending Loan Requests</h4>
+                    </div>
+                    <div class="p-3">
+                        {% if loan_requests %}
+                        {% for request in loan_requests %}
+                        <div class="request-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h5>{{ request.name }}</h5>
+                                    <p class="mb-1"><i class="fas fa-wallet me-1"></i> {{ request.user_wallet }}</p>
+                                </div>
+                                <div class="text-end">
+                                    <span class="status-badge badge-pending">Pending</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-2">
+                                <p class="mb-1"><i class="fas fa-dollar-sign me-1"></i> <strong>Amount:</strong> ${{
+                                    request.amount }}</p>
+                                <p class="mb-1"><i class="fas fa-calendar-alt me-1"></i> <strong>Duration:</strong> {{
+                                    request.duration }} months</p>
+                                <p class="mb-0"><i class="fas fa-money-bill-wave me-1"></i> <strong>Payment
+                                        Type:</strong>
+                                    {{ "Monthly" if request.payment_type == "monthly" else "Lump Sum" }}
+                                </p>
+                            </div>
+
+                            <div class="request-actions">
+                                <button class="request-action-button request-accept"
+                                    data-user="{{ request.user_wallet }}" data-amount="{{ request.amount }}"
+                                    data-duration="{{ request.duration }}"
+                                    data-payment_type="{{ request.payment_type }}" data-key="{{ request.key }}">
+                                    <i class="fas fa-check me-1"></i> Accept
+                                </button>
+                                <button class="request-action-button request-reject" data-key="{{ request.key }}">
+                                    <i class="fas fa-times me-1"></i> Reject
+                                </button>
+                                <button class="request-action-button message-user-btn"
+                                    data-user="{{ request.user_wallet }}" data-name="{{ request.name }}">
+                                    <i class="fas fa-comments me-1"></i> Chat
+                                </button>
+                                <button class="request-action-button view-profile-btn"
+                                    data-user="{{ request.user_wallet }}">
+                                    <i class="fas fa-user-circle me-1"></i> View Profile
+                                </button>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No pending loan requests</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Loan Deals Section -->
+        <div class="row mt-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h4><i class="fas fa-file-contract me-2"></i>Active Loan Deals</h4>
+                    </div>
+                    <div class="p-3">
+                        {% if deals %}
+                        {% for deal in deals %}
+                        <div class="deal-item">
+                            <div class="deal-header">
+                                <div>
+                                    {% if deal.source == 'blockchain' %}
+                                    <div class="deal-id">Deal #{{ deal.deal_id }}</div>
+                                    {% else %}
+                                    <div class="deal-id">Filebase Loan</div>
+                                    {% endif %}
+                                    <div class="source-badge">
+                                        <span class="badge bg-info">
+                                            {% if deal.source == 'blockchain' %}
+                                            Blockchain Deal
+                                            {% else %}
+                                            Filebase Loan
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="deal-status status-{{ deal.status }}">{{ deal.status|upper }}</div>
+                            </div>
+
+                            <div class="deal-details">
+                                <div class="deal-detail">
+                                    <span class="deal-label">User:</span>
+                                    <span class="deal-value">{{ deal.user }}</span>
+                                </div>
+                                <div class="deal-detail">
+                                    <span class="deal-label">Bank:</span>
+                                    <span class="deal-value">{{ deal.bank }}</span>
+                                </div>
+                                <div class="deal-detail">
+                                    <span class="deal-label">Amount:</span>
+                                    <span class="deal-value">${{ deal.amount }}</span>
+                                </div>
+                                <div class="deal-detail">
+                                    <span class="deal-label">Start Date:</span>
+                                    <span class="deal-value">
+                                        {% if deal.source == 'blockchain' %}
+                                        {{ deal.start_date|format_timestamp }}
+                                        {% else %}
+                                        {{ deal.start_date|format_timestamp }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="deal-detail">
+                                    <span class="deal-label">Deadline:</span>
+                                    <span class="deal-value">
+                                        {% if deal.source == 'blockchain' %}
+                                        {{ deal.deadline|format_timestamp }}
+                                        {% else %}
+                                        {{ deal.deadline|format_timestamp }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <div class="deal-detail">
+                                    <span class="deal-label">Payment Type:</span>
+                                    <span class="deal-value">
+                                        {% if deal.monthly_payment %}Monthly{% else %}Lump Sum{% endif %}
+                                    </span>
+                                </div>
+                                {% if deal.source == 'filebase' and deal.duration %}
+                                <div class="deal-detail">
+                                    <span class="deal-label">Duration:</span>
+                                    <span class="deal-value">{{ deal.duration }} months</span>
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            {% if deal.status == 'active' %}
+                            <div class="d-flex justify-content-end mt-2">
+                                <button class="btn btn-sm btn-primary me-2"
+                                    onclick="completeDeal('{{ deal.deal_id }}')">
+                                    <i class="fas fa-check-circle me-1"></i>Mark as Completed
+                                </button>
+                                <button class="btn btn-sm btn-secondary"
+                                    onclick="openChat('{{ deal.user }}', '{{ deal.user }}')">
+                                    <i class="fas fa-comments me-1"></i> Chat
+                                </button>
+                                <button class="btn btn-sm btn-warning rating-btn" data-deal-id="{{ deal.deal_id }}"
+                                    data-user-wallet="{{ deal.user }}">
+                                    Rate
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-file-contract"></i>
+                            <p>No active deals yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Partners Section -->
+        <div class="row mt-4">
+            <div class="col-lg-8 mx-auto">
+                <div class="section-card">
+                    <div class="section-header">
+                        <h4><i class="fas fa-comments me-2"></i>Chat Partners</h4>
+                    </div>
+                    <div class="p-3" id="chatPartnersContainer">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin"></i> Loading chat partners...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Deal Creation Modal -->
+    <div id="dealModal" class="modal">
+        <div class="modal-content">
+            <h3>Create Loan Deal</h3>
+            <div class="form-group">
+                <label>User Wallet Address</label>
+                <input type="text" id="dealUser" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>Loan Amount ($)</label>
+                <input type="number" id="dealAmount" class="form-control" readonly>
+            </div>
+            <div class="form-group">
+                <label>Repayment Deadline</label>
+                <input type="date" id="dealDeadline" class="form-control" min="">
+                <div class="date-info">Selected date: <span id="datePreview">None</span></div>
+                <div class="date-info">Unix timestamp: <span id="timestampPreview">0</span></div>
+            </div>
+            <div class="form-group">
+                <label>Payment Type</label>
+                <select id="dealPaymentType" class="form-control">
+                    <option value="installment">Installment Payments</option>
+                    <option value="lump-sum">Lump Sum Payment</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button id="submitDeal" class="btn btn-primary">Create Deal</button>
+                <button id="closeModal" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel">
+        <div class="chat-panel-header">
+            <h3 class="chat-panel-title">
+                <i class="fas fa-comments"></i>
+                <span id="chatPanelTitle">All User Chats</span>
+            </h3>
+            <div class="chat-panel-actions">
+                <button id="minimizeChat" class="chat-panel-btn">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button id="closeChat" class="chat-panel-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-users-container">
+            <div id="chatUsersList">
+                <!-- User tabs will be added here dynamically -->
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div id="chatMessages" class="chat-messages">
+                <div class="no-chat-selected">
+                    <div>
+                        <i class="fas fa-comment-slash fa-2x mb-3"></i>
+                        <p>Select a user to start chatting</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message...">
+                <button class="send-chat-btn" id="sendChatBtn">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <div id="ratingModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <h4>Rate User for Deal #<span id="ratingDealId"></span></h4>
+            <div class="form-group">
+                <label>Rating (1-5 stars)</label>
+                <div class="star-rating">
+                    <i class="far fa-star" data-value="1"></i>
+                    <i class="far fa-star" data-value="2"></i>
+                    <i class="far fa-star" data-value="3"></i>
+                    <i class="far fa-star" data-value="4"></i>
+                    <i class="far fa-star" data-value="5"></i>
+                </div>
+                <input type="hidden" id="ratingValue" value="0">
+            </div>
+            <div class="form-group">
+                <label>Comment</label>
+                <textarea id="ratingComment" class="form-control" placeholder="Your comment..."></textarea>
+            </div>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+                <button class="btn btn-secondary" id="closeRatingModal">Cancel</button>
+                <button class="btn btn-primary" id="submitRatingBtn">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bank-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>KYC Blockchain Platform</h5>
+                    <p>Secure and transparent Know Your Customer verification using blockchain technology.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2025 Tahmid hasan rafi. All rights reserved</p>
+                    <p class="mb-0">Bank Authority Dashboard v1.3</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            let currentDealId = null;
+            let currentUserWallet = null;
+
+            // Star rating functionality
+            $('.star-rating i').click(function () {
+                const value = $(this).data('value');
+                $('#ratingValue').val(value);
+                $('.star-rating i').removeClass('fas').addClass('far');
+                $(this).prevAll().addBack().removeClass('far').addClass('fas');
+            });
+
+            // Open rating modal
+            $(document).on('click', '.rating-btn', function () {
+                currentDealId = $(this).data('deal-id');
+                currentUserWallet = $(this).data('user-wallet');
+
+                $('#ratingDealId').text(currentDealId);
+                $('#ratingValue').val(0);
+                $('#ratingComment').val('');
+                $('.star-rating i').removeClass('fas').addClass('far');
+                $('#ratingModal').show();
+            });
+
+
+            // Close rating modal
+            $('#closeRatingModal').click(function () {
+                $('#ratingModal').hide();
+            });
+
+            // Submit rating
+            $('#submitRatingBtn').click(function () {
+                const stars = parseInt($('#ratingValue').val());
+                const comment = $('#ratingComment').val().trim();
+
+                if (stars < 1 || stars > 5) {
+                    alert('Please select a rating between 1 and 5 stars');
+                    return;
+                }
+
+                // Create JSON data with proper structure
+                const ratingData = {
+                    deal_id: currentDealId,
+                    user_wallet: currentUserWallet,
+                    stars: stars,
+                    comment: comment
+                };
+
+                // Use AJAX instead of $.post to set proper headers
+                $.ajax({
+                    url: '/submit-rating',
+                    type: 'POST',
+                    contentType: 'application/json',  // Set proper content type
+                    data: JSON.stringify(ratingData), // Stringify the JSON data
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Rating submitted successfully!');
+                            $('#ratingModal').hide();
+                        } else {
+                            alert('Error: ' + (response.error || 'Unknown error'));
+                        }
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        let errorMsg = 'Error submitting rating';
+                        try {
+                            const resp = JSON.parse(jqXHR.responseText);
+                            if (resp.error) errorMsg += ': ' + resp.error;
+                        } catch (e) {
+                            errorMsg += ' (server error: ' + textStatus + ')';
+                        }
+                        alert(errorMsg);
+                    }
+                });
+            });
+        });
+
+        // Bank wallet from template
+        const bankWallet = "{{ wallet }}";
+        let activeChats = {};
+        let currentChatUser = null;
+        let chatRefreshInterval = null;
+        let unreadMessages = {};
+
+        // Set min date to tomorrow
+        document.addEventListener('DOMContentLoaded', () => {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const minDate = tomorrow.toISOString().split('T')[0];
+            document.getElementById('dealDeadline').min = minDate;
+
+            // Update date previews
+            document.getElementById('dealDeadline').addEventListener('change', function () {
+                const dateStr = this.value;
+                document.getElementById('datePreview').textContent = dateStr;
+
+                if (dateStr) {
+                    const dateObj = new Date(dateStr);
+                    const timestamp = Math.floor(dateObj.getTime() / 1000);
+                    document.getElementById('timestampPreview').textContent = timestamp;
+                } else {
+                    document.getElementById('timestampPreview').textContent = '0';
+                }
+            });
+
+            // Add event listeners for accept/reject buttons
+            document.querySelectorAll('.request-accept').forEach(button => {
+                button.addEventListener('click', function () {
+                    const user = this.dataset.user;
+                    const amount = this.dataset.amount;
+                    const duration = this.dataset.duration;
+                    const payment_type = this.dataset.payment_type;
+                    const key = this.dataset.key;
+
+                    acceptLoanRequest(user, amount, duration, payment_type, key);
+                });
+            });
+
+            document.querySelectorAll('.request-reject').forEach(button => {
+                button.addEventListener('click', function () {
+                    const key = this.dataset.key;
+                    rejectLoanRequest(key);
+                });
+            });
+
+            // Add event listeners for chat buttons
+            document.querySelectorAll('.message-user-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const user = this.dataset.user;
+                    const name = this.dataset.name;
+                    openChat(user, name);
+                });
+            });
+
+            // Add this to the existing JavaScript
+            document.querySelectorAll('.view-profile-btn').forEach(button => {
+                button.addEventListener('click', function () {
+                    const userWallet = this.dataset.user;
+                    window.open(`/view-profile/${userWallet}`, '_blank');
+                });
+            });
+
+            // Chat panel controls
+            document.getElementById('minimizeChat').addEventListener('click', toggleChatPanel);
+            document.getElementById('closeChat').addEventListener('click', closeChatPanel);
+            document.getElementById('sendChatBtn').addEventListener('click', sendChatMessage);
+            document.getElementById('chatInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') sendChatMessage();
+            });
+
+            // Load recent chats from localStorage
+            loadRecentChats();
+
+            // Load all chat partners
+            loadAllChatPartners();
+            loadChatPartners();
+
+            // Start chat refresh
+            startChatRefresh();
+        });
+
+        // New function to load all chat partners
+        async function loadAllChatPartners() {
+            try {
+                const response = await fetch(`/get-all-chat-partners/${bankWallet}`);
+                const partners = await response.json();
+
+                partners.forEach(partner => {
+                    if (!activeChats[partner.wallet]) {
+                        activeChats[partner.wallet] = {
+                            wallet: partner.wallet,
+                            name: partner.name || partner.wallet,
+                            lastActive: Date.now()
+                        };
+                        addUserToChatList(partner.wallet, partner.name || partner.wallet);
+                    }
+                });
+
+                updateActiveChatsCount();
+            } catch (error) {
+                console.error('Error loading chat partners:', error);
+            }
+        }
+
+        // New function to load and display chat partners in the main section
+        async function loadChatPartners() {
+            try {
+                const container = document.getElementById('chatPartnersContainer');
+                container.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading chat partners...</div>';
+
+                const response = await fetch(`/get-all-chat-partners/${bankWallet}`);
+
+                // Check if the response is OK
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const partners = await response.json();
+
+                if (partners.length === 0) {
+                    container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>No chat partners found</p>
+                    </div>
+                `;
+                    return;
+                }
+
+                let html = '';
+                partners.forEach(partner => {
+                    html += `
+                <div class="chat-partner-card">
+                    <div class="chat-partner-header">
+                        <div class="partner-name">${partner.name}</div>
+                        <button class="chat-btn" onclick="openChat('${partner.wallet}', '${partner.name}')">
+                            <i class="fas fa-comment me-1"></i> Chat
+                        </button>
+                    </div>
+                    <div class="partner-wallet">
+                        <i class="fas fa-wallet me-1"></i> ${partner.wallet}
+                    </div>
+                </div>
+                `;
+                });
+
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading chat partners:', error);
+                const container = document.getElementById('chatPartnersContainer');
+                container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Error loading chat partners: ${error.message}</p>
+                </div>
+            `;
+            }
+        }
+
+        // Chat functions
+        function openChat(userWallet, userName) {
+            if (!userWallet) return;
+
+            // Add to active chats if not already present
+            if (!activeChats[userWallet]) {
+                activeChats[userWallet] = {
+                    wallet: userWallet,
+                    name: userName || userWallet,
+                    lastActive: Date.now()
+                };
+
+                // Add to UI
+                addUserToChatList(userWallet, userName);
+
+                // Update active chats counter
+                updateActiveChatsCount();
+            }
+
+            // Set as current chat
+            setCurrentChat(userWallet);
+
+            // Load chat messages
+            loadChatMessages(userWallet);
+
+            // Save to recent chats
+            saveToRecentChats(userWallet, userName);
+
+            // Ensure chat panel is visible
+            document.querySelector('.chat-panel').style.display = 'flex';
+        }
+
+        function setCurrentChat(userWallet) {
+            currentChatUser = userWallet;
+            const chatMessages = document.getElementById('chatMessages');
+
+            // Clear unread for this user
+            if (unreadMessages[userWallet]) {
+                unreadMessages[userWallet] = 0;
+                updateUserTab(userWallet);
+            }
+
+            // Update UI
+            document.querySelectorAll('.chat-user-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.user === userWallet);
+            });
+
+            // Set title
+            const user = activeChats[userWallet];
+            document.getElementById('chatPanelTitle').textContent = `Chatting with ${user.name || userWallet}`;
+
+            // Show chat container
+            chatMessages.innerHTML = '<div class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Loading messages...</div>';
+        }
+
+        async function loadChatMessages(userWallet) {
+            if (!userWallet) return;
+
+            try {
+                const response = await fetch(`/get-chat-messages?user=${userWallet}&bank=${bankWallet}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const chatContainer = document.getElementById('chatMessages');
+                    chatContainer.innerHTML = '';
+
+                    if (result.messages.length === 0) {
+                        chatContainer.innerHTML = `
+                            <div class="no-chat-selected">
+                                <i class="fas fa-comment-dots fa-2x mb-3"></i>
+                                <p>No messages yet. Start the conversation!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    result.messages.forEach(msg => {
+                        const isBank = msg.sender.toLowerCase() === bankWallet.toLowerCase();
+                        const time = new Date(msg.timestamp * 1000).toLocaleTimeString();
+
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = `chat-message ${isBank ? 'message-sent' : 'message-received'}`;
+
+                        msgDiv.innerHTML = `
+                            <div class="message-sender">${isBank ? 'You' : (activeChats[userWallet]?.name || userWallet)}</div>
+                            <p class="message-text">${msg.text}</p>
+                            <div class="message-time">${time}</div>
+                        `;
+
+                        chatContainer.appendChild(msgDiv);
+                    });
+
+                    // Scroll to bottom
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                }
+            } catch (error) {
+                console.error('Error loading chat:', error);
+                const chatContainer = document.getElementById('chatMessages');
+                chatContainer.innerHTML = '<div class="text-center py-4 text-danger">Error loading messages</div>';
+            }
+        }
+
+        async function sendChatMessage() {
+            if (!currentChatUser) {
+                alert('Please select a user to chat with');
+                return;
+            }
+
+            const message = document.getElementById('chatInput').value.trim();
+            if (!message) return;
+
+            try {
+                const response = await fetch('/send-chat-message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sender: bankWallet,
+                        receiver: currentChatUser,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Clear input
+                    document.getElementById('chatInput').value = '';
+
+                    // Reload messages
+                    loadChatMessages(currentChatUser);
+
+                    // Update last active time
+                    if (activeChats[currentChatUser]) {
+                        activeChats[currentChatUser].lastActive = Date.now();
+                    }
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showError('Failed to send message');
+            }
+        }
+
+        function addUserToChatList(userWallet, userName) {
+            const usersList = document.getElementById('chatUsersList');
+
+            // Check if user is already in the list
+            if (document.querySelector(`.chat-user-tab[data-user="${userWallet}"]`)) {
+                return;
+            }
+
+            const userTab = document.createElement('div');
+            userTab.className = 'chat-user-tab';
+            userTab.dataset.user = userWallet;
+            userTab.innerHTML = `
+                <i class="fas fa-user-circle"></i>
+                ${userName || userWallet}
+            `;
+
+            userTab.addEventListener('click', () => {
+                setCurrentChat(userWallet);
+                loadChatMessages(userWallet);
+            });
+
+            usersList.appendChild(userTab);
+            updateUserTab(userWallet);
+        }
+
+        function updateUserTab(userWallet) {
+            const tab = document.querySelector(`.chat-user-tab[data-user="${userWallet}"]`);
+            if (!tab) return;
+
+            // Update unread indicator
+            if (unreadMessages[userWallet] > 0 && userWallet !== currentChatUser) {
+                tab.classList.add('unread');
+            } else {
+                tab.classList.remove('unread');
+            }
+        }
+
+        function saveToRecentChats(userWallet, userName) {
+            // Get existing recent chats
+            const recentChats = JSON.parse(localStorage.getItem(`recentChats_${bankWallet}`) || []);
+
+            // Check if user is already in recent chats
+            const existingIndex = recentChats.findIndex(chat => chat.wallet === userWallet);
+
+            if (existingIndex !== -1) {
+                // Update existing entry
+                recentChats[existingIndex].name = userName || userWallet;
+                recentChats[existingIndex].lastActive = Date.now();
+            } else {
+                // Add new entry
+                recentChats.push({
+                    wallet: userWallet,
+                    name: userName || userWallet,
+                    lastActive: Date.now()
+                });
+            }
+
+            // Sort by last active (newest first)
+            recentChats.sort((a, b) => b.lastActive - a.lastActive);
+
+            // Keep only the last 10
+            if (recentChats.length > 10) {
+                recentChats.length = 10;
+            }
+
+            // Save to localStorage
+            localStorage.setItem(`recentChats_${bankWallet}`, JSON.stringify(recentChats));
+        }
+
+        function loadRecentChats() {
+            const recentChats = JSON.parse(localStorage.getItem(`recentChats_${bankWallet}`) || []);
+
+            // Add to active chats and UI
+            recentChats.forEach(chat => {
+                if (!activeChats[chat.wallet]) {
+                    activeChats[chat.wallet] = chat;
+                    addUserToChatList(chat.wallet, chat.name);
+                }
+            });
+
+            // Update active chats counter
+            updateActiveChatsCount();
+        }
+
+        function updateActiveChatsCount() {
+            const count = Object.keys(activeChats).length;
+            document.getElementById('activeChats').textContent = count;
+        }
+
+        function startChatRefresh() {
+            if (chatRefreshInterval) clearInterval(chatRefreshInterval);
+            chatRefreshInterval = setInterval(refreshChats, 5000);
+        }
+
+        async function refreshChats() {
+            if (!currentChatUser) return;
+
+            try {
+                const response = await fetch(`/get-chat-messages?user=${currentChatUser}&bank=${bankWallet}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const currentMessageCount = document.querySelectorAll('#chatMessages .chat-message').length;
+
+                    if (result.messages.length > currentMessageCount) {
+                        // New messages arrived
+                        if (currentChatUser) {
+                            // Reload messages if we're in this chat
+                            loadChatMessages(currentChatUser);
+                        } else {
+                            // Mark as unread if we're not in this chat
+                            if (!unreadMessages[currentChatUser]) {
+                                unreadMessages[currentChatUser] = 0;
+                            }
+                            unreadMessages[currentChatUser] += result.messages.length - currentMessageCount;
+                            updateUserTab(currentChatUser);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing chat:', error);
+            }
+        }
+
+        function toggleChatPanel() {
+            const chatPanel = document.querySelector('.chat-panel');
+            chatPanel.classList.toggle('minimized');
+
+            const icon = document.getElementById('minimizeChat').querySelector('i');
+            if (chatPanel.classList.contains('minimized')) {
+                icon.classList.remove('fa-minus');
+                icon.classList.add('fa-plus');
+            } else {
+                icon.classList.remove('fa-plus');
+                icon.classList.add('fa-minus');
+            }
+        }
+
+        function closeChatPanel() {
+            document.querySelector('.chat-panel').style.display = 'none';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            const successEl = document.getElementById('successMessage');
+            document.getElementById('successText').textContent = message;
+            successEl.style.display = 'block';
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                successEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            errorEl.style.display = 'block';
+
+            // Auto hide after 5 seconds
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Fetch bank deals from backend
+        async function fetchBankDeals() {
+            try {
+                const response = await fetch(`/get-bank-deals?bank=${bankWallet}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching deals:', error);
+                showError('Failed to fetch deals');
+                return [];
+            }
+        }
+
+        // Deal Actions
+        async function completeDeal(dealId) {
+            try {
+                const response = await fetch(`/complete-deal/${dealId}`, { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    showSuccess('Deal marked as completed');
+                    // Refresh deals list
+                    const deals = await fetchBankDeals();
+                    displayDeals(deals);
+                } else {
+                    showError('Failed to complete deal: ' + (result.message || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error completing deal:', error);
+                showError('Failed to complete deal');
+            }
+        }
+
+        // Display deals in the UI
+        function displayDeals(deals) {
+            const container = document.querySelector('.deals-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (deals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-file-contract"></i>
+                        <p>No active deals yet</p>
+                    </div>
+                `;
+                return;
+            }
+
+            deals.forEach(deal => {
+                // Convert timestamps to dates
+                const startDate = new Date(deal.start_date * 1000).toLocaleDateString();
+                const deadline = new Date(deal.deadline * 1000).toLocaleDateString();
+
+                const dealEl = document.createElement('div');
+                dealEl.className = 'deal-item';
+                dealEl.innerHTML = `
+                    <div class="deal-header">
+                        <div class="deal-id">Deal #${deal.deal_id}</div>
+                        <div class="deal-status status-${deal.status}">${deal.status.toUpperCase()}</div>
+                    </div>
+
+                    <div class="deal-details">
+                        <div class="deal-detail">
+                            <span class="deal-label">User:</span>
+                            <span class="deal-value">${deal.user}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Amount:</span>
+                            <span class="deal-value">$${deal.amount}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Start Date:</span>
+                            <span class="deal-value">${startDate}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Deadline:</span>
+                            <span class="deal-value">${deadline}</span>
+                        </div>
+                        <div class="deal-detail">
+                            <span class="deal-label">Payment Type:</span>
+                            <span class="deal-value">${deal.monthly_payment ? 'Monthly' : 'Lump Sum'}</span>
+                        </div>
+                    </div>
+                    ${deal.status === 'active' ? `
+                        <div class="d-flex justify-content-end mt-2">
+                            <button class="btn btn-sm btn-primary" 
+                                    onclick="completeDeal('${deal.deal_id}')">
+                                <i class="fas fa-check-circle me-1"></i>Mark as Completed
+                            </button>
+                        </div>
+                    ` : ''}
+                `;
+                container.appendChild(dealEl);
+            });
+        }
+
+        // Helper function to wait for transaction receipt
+        async function waitForTransactionReceipt(txHash) {
+            return new Promise((resolve, reject) => {
+                const interval = setInterval(async () => {
+                    try {
+                        const receipt = await ethereum.request({
+                            method: 'eth_getTransactionReceipt',
+                            params: [txHash]
+                        });
+
+                        if (receipt) {
+                            clearInterval(interval);
+                            resolve(receipt);
+                        }
+                    } catch (error) {
+                        clearInterval(interval);
+                        reject(error);
+                    }
+                }, 2000);
+            });
+        }
+
+        // Loan Request Actions
+        async function acceptLoanRequest(user, amount, duration, payment_type, key) {
+            try {
+                // Convert to proper types
+                const amountNum = Number(amount);
+                const durationNum = Number(duration);
+                const monthly = (payment_type === "monthly");
+
+                const response = await fetch('/create-deal-from-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_wallet: user,
+                        amount: amountNum,
+                        duration: durationNum,
+                        payment_type: monthly,
+                        request_key: key
+                    })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    // Show success message immediately
+                    showSuccess('Deal created successfully! Processing transaction...');
+
+                    // Remove the request from UI
+                    document.querySelectorAll('.request-item').forEach(item => {
+                        if (item.querySelector(`[data-key="${key}"]`)) {
+                            item.remove();
+                        }
+                    });
+
+                    try {
+                        // Ensure from address is set
+                        const txData = {
+                            ...result.txData,
+                            from: bankWallet  // Ensure from address is set
+                        };
+
+                        // Send transaction to wallet
+                        const txHash = await ethereum.request({
+                            method: 'eth_sendTransaction',
+                            params: [txData]
+                        });
+
+                        // Wait for transaction confirmation
+                        const receipt = await waitForTransactionReceipt(txHash);
+
+                        if (receipt && receipt.status) {
+                            showSuccess('Transaction confirmed! Refreshing deals...');
+
+                            // Refresh deals list after a short delay
+                            setTimeout(async () => {
+                                const deals = await fetchBankDeals();
+                                displayDeals(deals);
+                            }, 3000);
+                        } else {
+                            showError('Transaction failed on chain');
+                        }
+                    } catch (walletError) {
+                        console.error('Wallet error:', walletError);
+                        showError('Transaction failed: ' + walletError.message);
+                    }
+                } else {
+                    showError('Failed to create deal: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error accepting request:', error);
+                showError('Failed to accept request: ' + error.message);
+            }
+        }
+
+        async function rejectLoanRequest(key) {
+            try {
+                const response = await fetch('/reject-loan-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ request_key: key })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    showSuccess('Request rejected');
+
+                    // Remove the request from UI
+                    document.querySelectorAll('.request-item').forEach(item => {
+                        if (item.querySelector(`[data-key="${key}"]`)) {
+                            item.remove();
+                        }
+                    });
+                } else {
+                    showError('Failed to reject request: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error rejecting request:', error);
+                showError('Failed to reject request');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Set initial stats
+            document.getElementById('totalCustomers').textContent = '15';
+            document.getElementById('pendingKYC').textContent = '3';
+            document.getElementById('verifiedProfiles').textContent = '12';
+            updateActiveChatsCount();
+            loadChatPartners();
+        });
+    </script>
+</body>
+
+</html>

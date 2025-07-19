@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - KYC System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: #2c3e50;
+        }
+
+        .nav-link {
+            color: #ecf0f1 !important;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #3498db;
+        }
+
+        .stat-card {
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-preview {
+            max-height: 40px;
+            max-width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-0">
+                <div class="p-4 text-white">
+                    <h4>KYC Admin</h4>
+                    <hr class="bg-light">
+                    <p class="mb-1"><i class="bi bi-wallet"></i> Wallet:</p>
+                    <p class="small text-break">{{ admin_wallet }}</p>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#pending-banks">
+                            <i class="bi bi-hourglass-split me-2"></i> Pending Banks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#approved-banks">
+                            <i class="bi bi-check-circle me-2"></i> Approved Banks
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#users">
+                            <i class="bi bi-people me-2"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item mt-auto">
+                        <a class="nav-link" href="/adminlogout">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-10 p-4">
+                <h2 class="mb-4">Admin Dashboard</h2>
+
+                <!-- Stats Section -->
+                <div id="dashboard" class="mb-5">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Total Profiles</h5>
+                                    <h2>{{ stats.total_profiles }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Users</h5>
+                                    <h2>{{ stats.total_users }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Banks</h5>
+                                    <h2>{{ stats.total_banks }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card stat-card bg-warning text-dark">
+                                <div class="card-body">
+                                    <h5 class="card-title">Pending Approvals</h5>
+                                    <h2>{{ stats.pending_approvals }}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Banks Section -->
+                <div id="pending-banks" class="mb-5">
+                    <h3 class="mb-3">Pending Bank Approvals</h3>
+                    {% if pending_banks %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <th>Wallet Address</th>
+                                    <th>License Number</th>
+                                    <th>Submitted On</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bank in pending_banks %}
+                                <tr>
+                                    <td>{{ bank.bank_name }}</td>
+                                    <td class="text-break">{{ bank.wallet }}</td>
+                                    <td>{{ bank.license_number }}</td>
+                                    <td>{{ bank.formatted_date }}</td>
+                                    <td>
+                                        <a href="/approve-bank/{{ bank.wallet.lower() }}"
+                                            class="btn btn-success btn-sm">
+                                            Approve
+                                        </a>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#bankModal" data-wallet="{{ bank.wallet }}"
+                                            data-name="{{ bank.bank_name }}" data-email="{{ bank.email }}"
+                                            data-phone="{{ bank.phone }}" data-license="{{ bank.license_number }}"
+                                            data-logo="{{ bank.logo_cid }}">
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No pending bank approvals
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="pending-verifications" class="mb-5">
+                    <h3 class="mb-3">Pending Verifications</h3>
+                    {% if pending_verifications %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>User Name</th>
+                                    <th>Wallet Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in pending_verifications %}
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td class="text-break">{{ user.wallet }}</td>
+                                    <td>
+                                        <a href="/view-profile/{{ user.wallet }}" class="btn btn-sm btn-info me-1">
+                                            See Profile
+                                        </a>
+                                        <button class="btn btn-sm btn-success me-1 verify-btn"
+                                            data-user="{{ user.wallet }}" data-action="accept">
+                                            Accept
+                                        </button>
+                                        <button class="btn btn-sm btn-danger verify-btn" data-user="{{ user.wallet }}"
+                                            data-action="reject">
+                                            Reject
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No pending verification requests
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Approved Banks Section -->
+                <div id="approved-banks" class="mb-5">
+                    <h3 class="mb-3">Approved Banks</h3>
+                    {% if bank_profiles %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Bank Name</th>
+                                    <th>Wallet Address</th>
+                                    <th>Contact Email</th>
+                                    <th>Approval Date</th>
+                                    <th>Logo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bank in bank_profiles %}
+                                <tr>
+                                    <td>{{ bank.bank_name }}</td>
+                                    <td class="text-break">{{ bank.wallet }}</td>
+                                    <td>{{ bank.email }}</td>
+                                    <td>{{ bank.formatted_date }}</td>
+                                    <td>
+                                        {% if bank.logo_cid %}
+                                        <img src="{{ gateway_url }}{{ bank.logo_cid }}" class="logo-preview"
+                                            alt="Bank Logo">
+                                        {% else %}
+                                        <span class="text-muted">No logo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No approved banks yet
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div id="users">
+                    <h3 class="mb-3">User Profiles</h3>
+                    {% if user_profiles %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Wallet Address</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in user_profiles %}
+                                <tr>
+                                    <td>{{ user.full_name }}</td>
+                                    <td class="text-break">{{ user.wallet }}</td>
+                                    <td>
+                                        {% if user.verification_status == 1 %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% elif user.verification_status == 2 %}
+                                        <span class="badge bg-success">Verified</span>
+                                        {% else %}
+                                        <span class="badge bg-secondary">Unverified</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        No user profiles found
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bank Details Modal -->
+    <div class="modal fade" id="bankModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bank Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Bank Name:</strong>
+                        <span id="modal-bank-name"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Wallet Address:</strong>
+                        <span id="modal-wallet" class="text-break"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong>
+                        <span id="modal-email"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Phone:</strong>
+                        <span id="modal-phone"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>License Number:</strong>
+                        <span id="modal-license"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Logo:</strong><br>
+                        <img id="modal-logo" src="" class="img-fluid mt-2" alt="Bank Logo">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        async function signAndSendTransaction(txData) {
+            try {
+                // Check if web3 is available
+                if (typeof window.ethereum === 'undefined') {
+                    throw new Error('Web3 provider not found');
+                }
+
+                // Send transaction through MetaMask
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [txData]
+                });
+
+                // Wait for transaction confirmation
+                const receipt = await waitForTransactionReceipt(txHash);
+                return receipt.transactionHash;
+            } catch (error) {
+                console.error('Transaction error:', error);
+                throw error;
+            }
+        }
+
+        // Helper function to wait for transaction receipt
+        function waitForTransactionReceipt(txHash) {
+            return new Promise((resolve, reject) => {
+                const checkInterval = setInterval(async () => {
+                    try {
+                        const receipt = await w3.eth.getTransactionReceipt(txHash);
+                        if (receipt) {
+                            clearInterval(checkInterval);
+                            resolve(receipt);
+                        }
+                    } catch (error) {
+                        clearInterval(checkInterval);
+                        reject(error);
+                    }
+                }, 2000);
+            });
+        }
+
+        // Initialize Web3
+        let w3;
+        if (typeof window.ethereum !== 'undefined') {
+            w3 = new Web3(window.ethereum);
+        } else {
+            console.warn('Web3 provider not detected');
+        }
+
+
+        document.querySelectorAll('.verify-btn').forEach(btn => {
+            btn.addEventListener('click', async function () {
+                const userWallet = this.dataset.user;
+                const action = this.dataset.action;
+
+                // Check if MetaMask is installed
+                if (typeof window.ethereum === 'undefined') {
+                    alert('Please install MetaMask to verify users');
+                    return;
+                }
+
+                try {
+                    // Request account access if needed
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                    // Send request to backend
+                    const response = await fetch('/admin-verification-action', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            user_wallet: userWallet,
+                            action: action
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        if (action === 'accept' && result.txData) {
+                            // Add chain ID to transaction data
+                            result.txData.chainId = `0x${Number(w3.eth.chainId).toString(16)}`;
+
+                            const txHash = await signAndSendTransaction(result.txData);
+                            if (txHash) {
+                                alert(`Verification ${action}ed successfully! Transaction: ${txHash}`);
+                                location.reload();
+                            }
+                        } else {
+                            alert(`Verification ${action}ed successfully!`);
+                            location.reload();
+                        }
+                    } else {
+                        alert('Error: ' + (result.message || 'Action failed'));
+                    }
+                } catch (error) {
+                    console.error('Verification action error:', error);
+                    alert('Action failed: ' + error.message);
+                }
+            });
+        });
+        // Bank modal functionality
+        const bankModal = document.getElementById('bankModal');
+        bankModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const wallet = button.getAttribute('data-wallet');
+            const name = button.getAttribute('data-name');
+            const email = button.getAttribute('data-email');
+            const phone = button.getAttribute('data-phone');
+            const license = button.getAttribute('data-license');
+            const logoCid = button.getAttribute('data-logo');
+
+            document.getElementById('modal-bank-name').textContent = name;
+            document.getElementById('modal-wallet').textContent = wallet;
+            document.getElementById('modal-email').textContent = email;
+            document.getElementById('modal-phone').textContent = phone;
+            document.getElementById('modal-license').textContent = license;
+
+            const logoImg = document.getElementById('modal-logo');
+            if (logoCid) {
+                logoImg.src = "{{ gateway_url }}" + logoCid;
+                logoImg.style.display = "block";
+            } else {
+                logoImg.style.display = "none";
+            }
+        });
+    </script>
+</body>
+
+</html>
