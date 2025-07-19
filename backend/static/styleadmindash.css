@@ -1,0 +1,77 @@
+   .wallet-address {
+       font-family: monospace;
+       font-size: 0.9em;
+   }
+
+   .admin-header {
+       background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+   }
+
+   .stat-card {
+       border-radius: 10px;
+       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+       transition: transform 0.3s ease;
+   }
+
+   .stat-card:hover {
+       transform: translateY(-5px);
+   }
+
+   .action-buttons .btn {
+       margin-right: 5px;
+       margin-bottom: 5px;
+   }
+
+   .card-header {
+       font-weight: 600;
+       padding: 15px 20px;
+   }
+
+   .table th {
+       background-color: #f8f9fa;
+   }
+
+   .badge {
+       font-weight: 500;
+       padding: 0.5em 0.8em;
+   }
+
+   .logout-button a {
+       background-color: #e74c3c;
+       color: white;
+       padding: 8px 15px;
+       border-radius: 4px;
+       text-decoration: none;
+       transition: background-color 0.3s;
+   }
+
+   .logout-button a:hover {
+       background-color: #c0392b;
+       text-decoration: none;
+   }
+
+   .card {
+       border: none;
+       border-radius: 10px;
+       box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+       margin-bottom: 25px;
+   }
+
+   body {
+       background-color: #f5f7fb;
+       color: #34495e;
+       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   }
+
+   .navbar-brand {
+       font-weight: 600;
+       font-size: 1.3rem;
+   }
+
+   .table-hover tbody tr:hover {
+       background-color: #f1f5fd;
+   }
+
+   .container {
+       max-width: 1400px;
+   }
